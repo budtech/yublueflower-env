@@ -1,0 +1,114 @@
+#!/bin/bash
+[[ ! -x "$0" ]] && chmod +x "$0"
+
+export LC_ALL=C
+
+function yublueflower_banner() {
+    echo -e "\033[36m"
+    echo "Version       : vscn v0.0.1 (latest)"
+    echo "Architecture  : $(lsb_release -ds) ($(uname -m))"
+    echo "Time          : $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "Uptime        : $(uptime -p | sed 's/up //')"
+    echo -e "\033[0m"
+    echo ""
+}
+
+function yublueflower_env() {
+    vscn="$HOME/.local/bin/vscn"
+    path=$(realpath "$0")
+    [[ "$path" != "$vscn" ]] && mkdir -p "$HOME/.local/bin" && cp "$path" "$vscn" && chmod +x "$vscn"
+
+    if ! grep -q "export PATH=\$HOME/.local/bin:\$PATH" ~/.profile; then
+        echo "export PATH=\$HOME/.local/bin:\$PATH" >> ~/.profile
+    fi
+}
+
+function yublueflower_help() {
+    echo -e "\033[36mUsage:\033[0m"
+    echo "vscn --url http://testphp.vulnweb.com"
+    echo ""
+    echo -e "\033[36mOptions:\033[0m"
+    echo "--help                    Show help message"
+}
+
+function yublueflower_workflow() {
+    yublueflower_banner
+    local url=""
+    while [[ "$#" -gt 0 ]]; do
+        case "$1" in
+            --url)
+                if [[ -n "$2" && "$2" != -* ]]; then
+                    url="$2"
+                    shift 2
+                else
+                    echo -e "\033[31m[!] Missing URL after --url. Use --help for usage instructions\033[0m"
+                    exit 1
+                fi
+                ;;
+            *)
+                echo -e "\033[31m[!] Unrecognized argument: $1. Use --help for usage instructions\033[0m"
+                exit 1;;
+        esac
+    done
+
+    if [[ -z "$url" ]]; then
+        echo -e "\033[31m[!] Missing required --url argument. Use --help for usage instructions\033[0m"
+        exit 1
+    fi
+
+    local yublueflower_home="$HOME/yublueflower-cli/vscn"
+    local wrkd="vscn_$(date '+%Y%m%d_%H%M%S')"
+    local wrkp="$yublueflower_home/$wrkd"
+    mkdir -p "$yublueflower_home"
+    local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    echo "Testing started at $timestamp"
+
+    if ! [[ "$url" =~ ^https?:// ]]; then
+        echo -e "\033[31m[!] Please include http:// or https://. Use --help for usage instructions\033[0m"
+        exit 1
+    fi
+
+    timestamp=$(date "+%Y%m%d%H%M%S")
+
+    yublueflower_RSTs_raw="/tmp/yublueflower_RSTs_raw_$timestamp.txt"
+    yublueflower_RSTs_wrk="/tmp/yublueflower_RSTs_wrk_$timestamp.txt"
+    > "$yublueflower_RSTs_raw"
+
+    nuclei -u "$url" -timestamp -silent -markdown-export "$wrkp" | tee -a "$yublueflower_RSTs_raw"
+
+    perl -pe 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$yublueflower_RSTs_raw" | tee "$yublueflower_RSTs_wrk" > /dev/null
+    p1=0; p2=0; p3=0; p4=0; p5=0; unknown=0
+    while IFS= read -r line; do
+        case "$line" in
+            *"[critical]"*) ((p1++));;
+            *"[high]"*)     ((p2++));;
+            *"[medium]"*)   ((p3++));;
+            *"[low]"*)      ((p4++));;
+            *"[info]"*)     ((p5++));;
+            *"[unknown]"*)  ((unknown++));;
+        esac
+    done < "$yublueflower_RSTs_wrk"
+
+    echo -e "\033[36m🧠 Priority P1–P5\033[0m"
+    echo "Bug Bounty rewards await, P1 is bounty, P5 is trivia"
+    echo -e "P1: Critical      → $p1"
+    echo -e "P2: High          → $p2"
+    echo -e "P3: Medium        → $p3"
+    echo -e "P4: Low           → $p4"
+    echo -e "P5: Informational → $p5"
+    echo -e "Unknown           → $unknown"
+    echo -e "[\033[36m$(date '+%Y-%m-%d %H:%M:%S')\033[0m] Write-up path \033[36mglow $yublueflower_home/$wrkd\033[0m — security issues await"
+    [[ -f "$wrkp/index.md" ]] && rm -rf "$wrkp/index.md"
+    echo "Testing finished at $(date "+%Y-%m-%d %H:%M:%S")"
+    rm -rf "$yublueflower_RSTs_raw"
+    rm -rf "$yublueflower_RSTs_wrk"
+}
+
+if [[ -n $1 && $1 != --help ]]; then
+    yublueflower_workflow "$@"
+else
+    [[ -z $1 ]] && yublueflower_env
+    yublueflower_banner; yublueflower_help
+    [[ -z $1 ]] && exec bash -l
+    exit 0
+fi
