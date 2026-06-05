@@ -18,13 +18,13 @@ source ~/.profile
 ### init-env
 
 ```bash
-./init-env
+bash ./init-env
 ```
 
 ### vscn
 
 ```bash
-./vscn
+bash ./vscn
 ```
 
 ```bash
@@ -34,7 +34,7 @@ vscn --url https://example.com
 ### xast
 
 ```bash
-./xast
+bash ./xast
 ```
 
 ```bash
