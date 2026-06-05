@@ -70,13 +70,13 @@ function yublueflower_workflow() {
 
     timestamp=$(date "+%Y%m%d%H%M%S")
 
-    yublueflower_RSTs_raw="/tmp/yublueflower_RSTs_raw_$timestamp.txt"
-    yublueflower_RSTs_wrk="/tmp/yublueflower_RSTs_wrk_$timestamp.txt"
-    > "$yublueflower_RSTs_raw"
+    yublueflower_1337d3bg_raw="/tmp/yublueflower_1337d3bg_raw_$timestamp.txt"
+    yublueflower_1337d3bg_wrk="/tmp/yublueflower_1337d3bg_wrk_$timestamp.txt"
+    > "$yublueflower_1337d3bg_raw"
 
-    nuclei -u "$url" -timestamp -silent -markdown-export "$wrkp" | tee -a "$yublueflower_RSTs_raw"
+    nuclei -u "$url" -timestamp -silent -markdown-export "$wrkp" | tee -a "$yublueflower_1337d3bg_raw"
 
-    perl -pe 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$yublueflower_RSTs_raw" | tee "$yublueflower_RSTs_wrk" > /dev/null
+    perl -pe 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$yublueflower_1337d3bg_raw" | tee "$yublueflower_1337d3bg_wrk" > /dev/null
     p1=0; p2=0; p3=0; p4=0; p5=0; unknown=0
     while IFS= read -r line; do
         case "$line" in
@@ -87,7 +87,7 @@ function yublueflower_workflow() {
             *"[info]"*)     ((p5++));;
             *"[unknown]"*)  ((unknown++));;
         esac
-    done < "$yublueflower_RSTs_wrk"
+    done < "$yublueflower_1337d3bg_wrk"
 
     echo -e "\033[36m🧠 Priority P1–P5\033[0m"
     echo "Bug Bounty rewards await, P1 is bounty, P5 is trivia"
@@ -100,8 +100,8 @@ function yublueflower_workflow() {
     echo -e "[\033[36m$(date '+%Y-%m-%d %H:%M:%S')\033[0m] Write-up path \033[36mglow $yublueflower_home/$wrkd\033[0m — security issues await"
     [[ -f "$wrkp/index.md" ]] && rm -rf "$wrkp/index.md"
     echo "Testing finished at $(date "+%Y-%m-%d %H:%M:%S")"
-    rm -rf "$yublueflower_RSTs_raw"
-    rm -rf "$yublueflower_RSTs_wrk"
+    rm -rf "$yublueflower_1337d3bg_raw"
+    rm -rf "$yublueflower_1337d3bg_wrk"
 }
 
 if [[ -n $1 && $1 != --help ]]; then
