@@ -127,7 +127,7 @@ function yublueflower_workflow() {
         grep -E "^${url%/}(/|$)" |
         grep -Ev "$yublueflower_1337scr1_regex" |
         grep -Ev "$yublueflower_1337b4sh_regex" |
-        awk -F'?' '
+        gawk -F'?' '
         $2{
             out=$1"?"
 
@@ -149,66 +149,72 @@ function yublueflower_workflow() {
         grep -Ev 'https?://[^ ]+https?://' |
         grep -Ev '[?&][^=]*[^a-zA-Z0-9_.-][^=]*=' |
         cut -d' ' -f1 |
-        awk -F'?' '
+        gawk -F'?' '
         {
-            path=$1
+            path = $1
 
-            gsub(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/,":uuid",path)
+            nseg = split(path, seg, "/")
 
-            nseg=split(path,seg,"/")
-            path=""
+            path = ""
 
-            for(i=1;i<=nseg;i++){
+            for (i = 1; i <= nseg; i++) {
 
-                if(seg[i] ~ /^[0-9a-fA-F]{16,}$/)
-                    seg[i]=":rid"
-                else if(length(seg[i]) >= 12 &&
-                        seg[i] ~ /^[A-Za-z0-9_-]+$/ &&
-                        seg[i] ~ /[A-Za-z]/ &&
-                        seg[i] ~ /[0-9]/)
-                    seg[i]=":rid"
-
-                path = (path=="" ? seg[i] : path"/"seg[i])
-            }
-
-            gsub(/[0-9]+/,":id",path)
-
-            while(gsub(/:id[-_\.\/]:id/,":id",path));
-
-            sig=path
-
-            if($2){
-
-                delete keys
-                delete ordered
-                c=0
-
-                n=split($2,p,"&")
-
-                for(i=1;i<=n;i++){
-                    split(p[i],kv,"=")
-                    if(kv[1]!="" && !keys[kv[1]]++)
-                        ordered[++c]=kv[1]
+                if (seg[i] ~ /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/) {
+                    seg[i] = ":uuid"
+                }
+                else if (seg[i] ~ /^[0-9a-fA-F]{24,}$/) {
+                    seg[i] = ":rid"
+                }
+                else if (length(seg[i]) >= 14 && seg[i] ~ /^[A-Za-z0-9_-]+$/ && seg[i] ~ /[A-Za-z]/ && seg[i] ~ /[0-9]/) {
+                    seg[i] = ":rid"
+                }
+                else if (seg[i] ~ /^[0-9]+$/) {
+                    seg[i] = ":id"
                 }
 
-                for(i=1;i<=c;i++){
-                    for(j=i+1;j<=c;j++){
-                        if(ordered[i] > ordered[j]){
-                            tmp=ordered[i]
-                            ordered[i]=ordered[j]
-                            ordered[j]=tmp
+                path = (path == "" ? seg[i] : path "/" seg[i])
+            }
+
+            sig = path
+
+            if ($2) {
+
+                delete ordered
+                delete keys
+
+                c = 0
+
+                n = split($2, p, "&")
+
+                for (i = 1; i <= n; i++) {
+
+                    split(p[i], kv, "=")
+
+                    if (kv[1] != "" && !keys[kv[1]]++) {
+                        ordered[++c] = kv[1]
+                    }
+                }
+
+                for (i = 1; i <= c; i++) {
+
+                    for (j = i + 1; j <= c; j++) {
+
+                        if (ordered[i] > ordered[j]) {
+                            tmp = ordered[i]
+                            ordered[i] = ordered[j]
+                            ordered[j] = tmp
                         }
                     }
                 }
 
-                for(i=1;i<=c;i++)
-                    sig=sig"&"ordered[i]
+                for (i = 1; i <= c; i++) {
+                    sig = sig "&" ordered[i]
+                }
             }
 
-            if(!seen[sig]++)
+            if (!seen[sig]++) {
                 print
-
-            c=0
+            }
         }' | yublueflower_1337c0de_log | while read -r line; do
             echo -e "[\e[36m$(date '+%Y-%m-%d %H:%M:%S')\e[0m] $line"
         done
@@ -231,7 +237,7 @@ function yublueflower_workflow() {
         grep "\?.*=" |
         grep -Ev "$yublueflower_1337scr1_regex" |
         grep -Ev "$yublueflower_1337b4sh_regex" |
-        awk -F'?' '
+        gawk -F'?' '
         $2{
             out=$1"?"
 
@@ -253,66 +259,72 @@ function yublueflower_workflow() {
         grep -Ev 'https?://[^ ]+https?://' |
         grep -Ev '[?&][^=]*[^a-zA-Z0-9_.-][^=]*=' |
         cut -d' ' -f1 |
-        awk -F'?' '
+        gawk -F'?' '
         {
-            path=$1
+            path = $1
 
-            gsub(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/,":uuid",path)
+            nseg = split(path, seg, "/")
 
-            nseg=split(path,seg,"/")
-            path=""
+            path = ""
 
-            for(i=1;i<=nseg;i++){
+            for (i = 1; i <= nseg; i++) {
 
-                if(seg[i] ~ /^[0-9a-fA-F]{16,}$/)
-                    seg[i]=":rid"
-                else if(length(seg[i]) >= 12 &&
-                        seg[i] ~ /^[A-Za-z0-9_-]+$/ &&
-                        seg[i] ~ /[A-Za-z]/ &&
-                        seg[i] ~ /[0-9]/)
-                    seg[i]=":rid"
-
-                path = (path=="" ? seg[i] : path"/"seg[i])
-            }
-
-            gsub(/[0-9]+/,":id",path)
-
-            while(gsub(/:id[-_\.\/]:id/,":id",path));
-
-            sig=path
-
-            if($2){
-
-                delete keys
-                delete ordered
-                c=0
-
-                n=split($2,p,"&")
-
-                for(i=1;i<=n;i++){
-                    split(p[i],kv,"=")
-                    if(kv[1]!="" && !keys[kv[1]]++)
-                        ordered[++c]=kv[1]
+                if (seg[i] ~ /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/) {
+                    seg[i] = ":uuid"
+                }
+                else if (seg[i] ~ /^[0-9a-fA-F]{24,}$/) {
+                    seg[i] = ":rid"
+                }
+                else if (length(seg[i]) >= 14 && seg[i] ~ /^[A-Za-z0-9_-]+$/ && seg[i] ~ /[A-Za-z]/ && seg[i] ~ /[0-9]/) {
+                    seg[i] = ":rid"
+                }
+                else if (seg[i] ~ /^[0-9]+$/) {
+                    seg[i] = ":id"
                 }
 
-                for(i=1;i<=c;i++){
-                    for(j=i+1;j<=c;j++){
-                        if(ordered[i] > ordered[j]){
-                            tmp=ordered[i]
-                            ordered[i]=ordered[j]
-                            ordered[j]=tmp
+                path = (path == "" ? seg[i] : path "/" seg[i])
+            }
+
+            sig = path
+
+            if ($2) {
+
+                delete ordered
+                delete keys
+
+                c = 0
+
+                n = split($2, p, "&")
+
+                for (i = 1; i <= n; i++) {
+
+                    split(p[i], kv, "=")
+
+                    if (kv[1] != "" && !keys[kv[1]]++) {
+                        ordered[++c] = kv[1]
+                    }
+                }
+
+                for (i = 1; i <= c; i++) {
+
+                    for (j = i + 1; j <= c; j++) {
+
+                        if (ordered[i] > ordered[j]) {
+                            tmp = ordered[i]
+                            ordered[i] = ordered[j]
+                            ordered[j] = tmp
                         }
                     }
                 }
 
-                for(i=1;i<=c;i++)
-                    sig=sig"&"ordered[i]
+                for (i = 1; i <= c; i++) {
+                    sig = sig "&" ordered[i]
+                }
             }
 
-            if(!seen[sig]++)
+            if (!seen[sig]++) {
                 print
-
-            c=0
+            }
         }' | yublueflower_1337c0de_log | while read -r line; do
             echo -e "[\e[36m$(date '+%Y-%m-%d %H:%M:%S')\e[0m] $line"
         done
@@ -334,7 +346,7 @@ function yublueflower_workflow() {
             grep -E "^${url%/}(/|$)" |
             grep -Ev "$yublueflower_1337scr1_regex" |
             grep -Ev "$yublueflower_1337b4sh_regex" |
-            awk -F'?' '
+            gawk -F'?' '
             $2{
                 out=$1"?"
 
@@ -356,66 +368,72 @@ function yublueflower_workflow() {
             grep -Ev 'https?://[^ ]+https?://' |
             grep -Ev '[?&][^=]*[^a-zA-Z0-9_.-][^=]*=' |
             cut -d' ' -f1 |
-            awk -F'?' '
+            gawk -F'?' '
             {
-                path=$1
+                path = $1
 
-                gsub(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/,":uuid",path)
+                nseg = split(path, seg, "/")
 
-                nseg=split(path,seg,"/")
-                path=""
+                path = ""
 
-                for(i=1;i<=nseg;i++){
+                for (i = 1; i <= nseg; i++) {
 
-                    if(seg[i] ~ /^[0-9a-fA-F]{16,}$/)
-                        seg[i]=":rid"
-                    else if(length(seg[i]) >= 12 &&
-                            seg[i] ~ /^[A-Za-z0-9_-]+$/ &&
-                            seg[i] ~ /[A-Za-z]/ &&
-                            seg[i] ~ /[0-9]/)
-                        seg[i]=":rid"
-
-                    path = (path=="" ? seg[i] : path"/"seg[i])
-                }
-
-                gsub(/[0-9]+/,":id",path)
-
-                while(gsub(/:id[-_\.\/]:id/,":id",path));
-
-                sig=path
-
-                if($2){
-
-                    delete keys
-                    delete ordered
-                    c=0
-
-                    n=split($2,p,"&")
-
-                    for(i=1;i<=n;i++){
-                        split(p[i],kv,"=")
-                        if(kv[1]!="" && !keys[kv[1]]++)
-                            ordered[++c]=kv[1]
+                    if (seg[i] ~ /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/) {
+                        seg[i] = ":uuid"
+                    }
+                    else if (seg[i] ~ /^[0-9a-fA-F]{24,}$/) {
+                        seg[i] = ":rid"
+                    }
+                    else if (length(seg[i]) >= 14 && seg[i] ~ /^[A-Za-z0-9_-]+$/ && seg[i] ~ /[A-Za-z]/ && seg[i] ~ /[0-9]/) {
+                        seg[i] = ":rid"
+                    }
+                    else if (seg[i] ~ /^[0-9]+$/) {
+                        seg[i] = ":id"
                     }
 
-                    for(i=1;i<=c;i++){
-                        for(j=i+1;j<=c;j++){
-                            if(ordered[i] > ordered[j]){
-                                tmp=ordered[i]
-                                ordered[i]=ordered[j]
-                                ordered[j]=tmp
+                    path = (path == "" ? seg[i] : path "/" seg[i])
+                }
+
+                sig = path
+
+                if ($2) {
+
+                    delete ordered
+                    delete keys
+
+                    c = 0
+
+                    n = split($2, p, "&")
+
+                    for (i = 1; i <= n; i++) {
+
+                        split(p[i], kv, "=")
+
+                        if (kv[1] != "" && !keys[kv[1]]++) {
+                            ordered[++c] = kv[1]
+                        }
+                    }
+
+                    for (i = 1; i <= c; i++) {
+
+                        for (j = i + 1; j <= c; j++) {
+
+                            if (ordered[i] > ordered[j]) {
+                                tmp = ordered[i]
+                                ordered[i] = ordered[j]
+                                ordered[j] = tmp
                             }
                         }
                     }
 
-                    for(i=1;i<=c;i++)
-                        sig=sig"&"ordered[i]
+                    for (i = 1; i <= c; i++) {
+                        sig = sig "&" ordered[i]
+                    }
                 }
 
-                if(!seen[sig]++)
+                if (!seen[sig]++) {
                     print
-
-                c=0
+                }
             }' | yublueflower_1337c0de_log | while read -r line; do
                 echo -e "[\e[36m$(date '+%Y-%m-%d %H:%M:%S')\e[0m] $line"
             done
