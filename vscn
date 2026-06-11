@@ -31,6 +31,34 @@ function yublueflower_help() {
     echo "--help                    Show help message"
 }
 
+function yublueflower_cleanup() {
+    local file
+    for file in "$yublueflower_1337d3bg_raw" "$yublueflower_1337d3bg_wrk"; do
+        [[ -n "$file" && -e "$file" ]] && unlink "$file"
+    done
+    return 0
+}
+
+function yublueflower_report_fallback() {
+    local report_file
+    if ! compgen -G "$wrkp/*.md" > /dev/null; then
+        report_file="$wrkp/possible-active-protection-mechanisms.md"
+        {
+            echo "# Possible Active Protection Mechanisms"
+            echo ""
+            echo "No findings were identified during this assessment."
+            echo ""
+            echo "Possible reasons include:"
+            echo ""
+            echo "- Security protection mechanisms limiting access to certain areas."
+            echo "- Authentication or specific access privileges being required."
+            echo "- Features, endpoints, or parameters not being reachable during the assessment."
+            echo ""
+            echo "These conditions may affect the visibility and coverage of the web application or API being assessed."
+        } > "$report_file"
+    fi
+}
+
 function yublueflower_workflow() {
     yublueflower_banner
     local url=""
@@ -57,9 +85,11 @@ function yublueflower_workflow() {
     fi
 
     local yublueflower_home="$HOME/yublueflower-cli/vscn"
-    local wrkd="vscn_$(date '+%Y%m%d_%H%M%S')"
-    local wrkp="$yublueflower_home/$wrkd"
     mkdir -p "$yublueflower_home"
+    local wrkp
+    wrkp=$(mktemp -d "$yublueflower_home/vscn_$(date '+%Y%m%d_%H%M%S')_XXXXXX_mktemp")
+    local wrkd
+    wrkd=$(basename "$wrkp")
     local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
     echo "Testing started at $timestamp"
 
@@ -70,9 +100,11 @@ function yublueflower_workflow() {
 
     timestamp=$(date "+%Y%m%d%H%M%S")
 
-    yublueflower_1337d3bg_raw="/tmp/yublueflower_1337d3bg_raw_$timestamp.txt"
-    yublueflower_1337d3bg_wrk="/tmp/yublueflower_1337d3bg_wrk_$timestamp.txt"
-    > "$yublueflower_1337d3bg_raw"
+    yublueflower_1337d3bg_raw=$(mktemp "/tmp/yublueflower_1337d3bg_raw_${timestamp}_XXXXXX_mktemp.txt")
+    yublueflower_1337d3bg_wrk=$(mktemp "/tmp/yublueflower_1337d3bg_wrk_${timestamp}_XXXXXX_mktemp.txt")
+    trap yublueflower_cleanup EXIT
+    trap 'yublueflower_cleanup; exit 130' INT
+    trap 'yublueflower_cleanup; exit 143' TERM
 
     nuclei -u "$url" -timestamp -silent -markdown-export "$wrkp" | tee -a "$yublueflower_1337d3bg_raw"
 
@@ -98,10 +130,9 @@ function yublueflower_workflow() {
     echo -e "P5: Informational → $p5"
     echo -e "Unknown           → $unknown"
     echo -e "[\033[36m$(date '+%Y-%m-%d %H:%M:%S')\033[0m] Write-up path \033[36mglow $yublueflower_home/$wrkd\033[0m — security issues await"
-    [[ -f "$wrkp/index.md" ]] && rm -rf "$wrkp/index.md"
+    [[ -f "$wrkp/index.md" ]] && unlink "$wrkp/index.md"
+    yublueflower_report_fallback
     echo "Testing finished at $(date "+%Y-%m-%d %H:%M:%S")"
-    rm -rf "$yublueflower_1337d3bg_raw"
-    rm -rf "$yublueflower_1337d3bg_wrk"
 }
 
 if [[ -n $1 && $1 != --help ]]; then

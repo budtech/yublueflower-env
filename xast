@@ -43,6 +43,43 @@ function yublueflower_1337scr1_log() {
     [[ "$silent" == "--silent" ]] && cat >> "$yublueflower_1337scr1_raw" || tee -a "$yublueflower_1337scr1_raw"
 }
 
+function yublueflower_cleanup() {
+    local file
+    for file in \
+        "$yublueflower_1337c0de_raw" \
+        "$yublueflower_1337c0de_tmp" \
+        "$yublueflower_1337c0de_wrk" \
+        "$yublueflower_1337scr1_raw" \
+        "$yublueflower_1337scr1_tmp" \
+        "$yublueflower_1337scr1_wrk" \
+        "$yublueflower_1337d3bg_raw" \
+        "$yublueflower_1337d3bg_wrk"
+    do
+        [[ -n "$file" && -e "$file" ]] && unlink "$file"
+    done
+    return 0
+}
+
+function yublueflower_report_fallback() {
+    local report_file
+    if ! compgen -G "$wrkp/*.md" > /dev/null; then
+        report_file="$wrkp/possible-active-protection-mechanisms.md"
+        {
+            echo "# Possible Active Protection Mechanisms"
+            echo ""
+            echo "No findings were identified during this assessment."
+            echo ""
+            echo "Possible reasons include:"
+            echo ""
+            echo "- Security protection mechanisms limiting access to certain areas."
+            echo "- Authentication or specific access privileges being required."
+            echo "- Features, endpoints, or parameters not being reachable during the assessment."
+            echo ""
+            echo "These conditions may affect the visibility and coverage of the web application or API being assessed."
+        } > "$report_file"
+    fi
+}
+
 function yublueflower_workflow() {
     yublueflower_banner
     local url="" web_archives="" extended_workflows="" silent=""
@@ -94,9 +131,11 @@ function yublueflower_workflow() {
     fi
 
     local yublueflower_home="$HOME/yublueflower-cli/xast"
-    local wrkd="xast_$(date '+%Y%m%d_%H%M%S')"
-    local wrkp="$yublueflower_home/$wrkd"
     mkdir -p "$yublueflower_home"
+    local wrkp
+    wrkp=$(mktemp -d "$yublueflower_home/xast_$(date '+%Y%m%d_%H%M%S')_XXXXXX_mktemp")
+    local wrkd
+    wrkd=$(basename "$wrkp")
     local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
     echo "Testing started at $timestamp"
 
@@ -107,15 +146,16 @@ function yublueflower_workflow() {
 
     domain=$(echo "$url" | sed -E 's|https?://||' | cut -d'/' -f1)
     timestamp=$(date "+%Y%m%d%H%M%S")
-    yublueflower_1337c0de_raw="/tmp/yublueflower_1337c0de_raw_$timestamp.txt"    
-    yublueflower_1337c0de_tmp="/tmp/yublueflower_1337c0de_tmp_$timestamp.txt"
-    yublueflower_1337c0de_wrk="/tmp/yublueflower_1337c0de_wrk_$timestamp.txt"
-    > "$yublueflower_1337c0de_raw"
+    yublueflower_1337c0de_raw=$(mktemp "/tmp/yublueflower_1337c0de_raw_${timestamp}_XXXXXX_mktemp.txt")
+    yublueflower_1337c0de_tmp=$(mktemp "/tmp/yublueflower_1337c0de_tmp_${timestamp}_XXXXXX_mktemp.txt")
+    yublueflower_1337c0de_wrk=$(mktemp "/tmp/yublueflower_1337c0de_wrk_${timestamp}_XXXXXX_mktemp.txt")
 
-    yublueflower_1337scr1_raw="/tmp/yublueflower_1337scr1_raw_$timestamp.txt"    
-    yublueflower_1337scr1_tmp="/tmp/yublueflower_1337scr1_tmp_$timestamp.txt"
-    yublueflower_1337scr1_wrk="/tmp/yublueflower_1337scr1_wrk_$timestamp.txt"
-    > "$yublueflower_1337scr1_raw"
+    yublueflower_1337scr1_raw=$(mktemp "/tmp/yublueflower_1337scr1_raw_${timestamp}_XXXXXX_mktemp.txt")
+    yublueflower_1337scr1_tmp=$(mktemp "/tmp/yublueflower_1337scr1_tmp_${timestamp}_XXXXXX_mktemp.txt")
+    yublueflower_1337scr1_wrk=$(mktemp "/tmp/yublueflower_1337scr1_wrk_${timestamp}_XXXXXX_mktemp.txt")
+    trap yublueflower_cleanup EXIT
+    trap 'yublueflower_cleanup; exit 130' INT
+    trap 'yublueflower_cleanup; exit 143' TERM
     
     yublueflower_1337scr1_regex='\.(jpg|jpeg|png|gif|svg|ico|css|js|woff2?|ttf|eot|pdf|zip|tar|gz|rar|mp4|mp3|docx?|xlsx?|pptx?|exe|apk|json|xml|csv)(\?|$)'
 
@@ -453,17 +493,13 @@ function yublueflower_workflow() {
     tee -a "$yublueflower_1337c0de_tmp" < "$yublueflower_1337c0de_raw" > /dev/null && awk -F'[?]' '!seen[$1]++' "$yublueflower_1337c0de_tmp" | sort -u | tee "$yublueflower_1337c0de_wrk" > /dev/null && tee "$yublueflower_1337c0de_tmp" < "$yublueflower_1337c0de_wrk" > /dev/null
     tee -a "$yublueflower_1337scr1_tmp" < "$yublueflower_1337scr1_raw" > /dev/null && awk -F'[?]' '!seen[$1]++' "$yublueflower_1337scr1_tmp" | sort -u | tee "$yublueflower_1337scr1_wrk" > /dev/null && tee "$yublueflower_1337scr1_tmp" < "$yublueflower_1337scr1_wrk" > /dev/null
 
-    rm -rf "$yublueflower_1337c0de_raw" "$yublueflower_1337c0de_tmp"
-    rm -rf "$yublueflower_1337scr1_raw" "$yublueflower_1337scr1_tmp"
-    
     rraw=()
     for h in "${live_session[@]}"; do
         rraw+=("-header" "$h")
     done
 
-    yublueflower_1337d3bg_raw="/tmp/yublueflower_1337d3bg_raw_$timestamp.txt"
-    yublueflower_1337d3bg_wrk="/tmp/yublueflower_1337d3bg_wrk_$timestamp.txt"
-    > "$yublueflower_1337d3bg_raw"
+    yublueflower_1337d3bg_raw=$(mktemp "/tmp/yublueflower_1337d3bg_raw_${timestamp}_XXXXXX_mktemp.txt")
+    yublueflower_1337d3bg_wrk=$(mktemp "/tmp/yublueflower_1337d3bg_wrk_${timestamp}_XXXXXX_mktemp.txt")
 
     if [[ "$extended_workflows" != "--extended-workflows" ]]; then
         nuclei -u "$url" -timestamp "${rraw[@]}" -silent -markdown-export "$wrkp" | tee -a "$yublueflower_1337d3bg_raw"
@@ -496,13 +532,9 @@ function yublueflower_workflow() {
     echo -e "P5: Informational → $p5"
     echo -e "Unknown           → $unknown"
     echo -e "[\033[36m$(date '+%Y-%m-%d %H:%M:%S')\033[0m] Write-up path \033[36mglow $yublueflower_home/$wrkd\033[0m — security issues await"
-    [[ -f "$wrkp/index.md" ]] && rm -rf "$wrkp/index.md"
+    [[ -f "$wrkp/index.md" ]] && unlink "$wrkp/index.md"
+    yublueflower_report_fallback
     echo "Testing finished at $(date "+%Y-%m-%d %H:%M:%S")"
-    rm -rf "$yublueflower_1337d3bg_raw"
-
-    rm -rf "$yublueflower_1337c0de_wrk"
-    rm -rf "$yublueflower_1337scr1_wrk"
-    rm -rf "$yublueflower_1337d3bg_wrk"
 }
 
 if [[ -n $1 && $1 != --help ]]; then
