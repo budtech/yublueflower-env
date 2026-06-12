@@ -31,7 +31,7 @@ function yublueflower_env() {
 }
 
 function yublueflower_sync() {
-    log="$HOME/template-sync.log"
+    log="/tmp/template-sync.log"
 
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting template synchronization..." >> "$log"
 
