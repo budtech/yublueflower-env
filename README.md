@@ -49,6 +49,32 @@ xast --url https://example.com --live-session "Cookie: session=xxx"
 xast --url https://example.com --extended-workflows
 ```
 
+### template-sync
+
+```bash
+bash ./template-sync
+```
+
+### Log
+
+```bash
+tail -f ~/template-sync.log
+```
+
+### Schedule
+
+The tool automatically creates a cron job that synchronizes templates every day at **01:00 JST**.
+
+```bash
+crontab -l
+```
+
+Example:
+
+```cron
+0 1 * * * /home/<user>/.local/bin/template-sync >/dev/null 2>&1
+```
+
 ## License
 
 `yublueflower` is made with ♥ and released under the MIT license.
