@@ -58,7 +58,7 @@ bash ./template-sync
 ### Log
 
 ```bash
-tail -f ~/template-sync.log
+tail -f /tmp/template-sync.log
 ```
 
 ### Schedule
