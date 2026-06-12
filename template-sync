@@ -1,0 +1,66 @@
+#!/bin/bash
+
+[[ ! -x "$0" ]] && chmod +x "$0"
+
+export LC_ALL=C
+
+function yublueflower_banner() {
+    echo -e "\033[36m"
+    echo "Version       : template-sync v0.0.1 (latest)"
+    echo "Architecture  : $(lsb_release -ds 2>/dev/null || echo Linux) ($(uname -m))"
+    echo "Time          : $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "Uptime        : $(uptime -p 2>/dev/null | sed 's/up //')"
+    echo -e "\033[0m"
+    echo ""
+}
+
+function yublueflower_env() {
+    template_sync="$HOME/.local/bin/template-sync"
+    path=$(realpath "$0")
+
+    mkdir -p "$HOME/.local/bin"
+
+    if [[ "$path" != "$template_sync" ]]; then
+        cp "$path" "$template_sync"
+        chmod +x "$template_sync"
+    fi
+
+    if ! grep -q 'export PATH=$HOME/.local/bin:$PATH' "$HOME/.profile" 2>/dev/null; then
+        echo 'export PATH=$HOME/.local/bin:$PATH' >> "$HOME/.profile"
+    fi
+}
+
+function yublueflower_sync() {
+    log="$HOME/template-sync.log"
+
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting template synchronization..." >> "$log"
+
+    output=$(nuclei -update-templates 2>&1)
+    update_status=$?
+
+    echo "$output" | \
+    sed -r 's/\x1B\[[0-9;]*m//g' | \
+    grep -E '^\[(INF|ERR)\]' \
+    >> "$log"
+
+    if [[ $update_status -eq 0 ]]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Synchronization successful." >> "$log"
+    else
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Synchronization failed." >> "$log"
+        exit 1
+    fi
+}
+
+function yublueflower_cron() {
+    cronjob="0 1 * * * $HOME/.local/bin/template-sync >/dev/null 2>&1"
+
+    (
+        crontab -l 2>/dev/null | grep -Fv "template-sync"
+        echo "$cronjob"
+    ) | crontab -
+}
+
+yublueflower_banner
+yublueflower_env
+yublueflower_sync
+yublueflower_cron
