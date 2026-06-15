@@ -490,8 +490,8 @@ function yublueflower_workflow() {
         fi
     fi
 
-    tee -a "$yublueflower_1337c0de_tmp" < "$yublueflower_1337c0de_raw" > /dev/null && awk -F'[?]' '!seen[$1]++' "$yublueflower_1337c0de_tmp" | sort -u | tee "$yublueflower_1337c0de_wrk" > /dev/null && tee "$yublueflower_1337c0de_tmp" < "$yublueflower_1337c0de_wrk" > /dev/null
-    tee -a "$yublueflower_1337scr1_tmp" < "$yublueflower_1337scr1_raw" > /dev/null && awk -F'[?]' '!seen[$1]++' "$yublueflower_1337scr1_tmp" | sort -u | tee "$yublueflower_1337scr1_wrk" > /dev/null && tee "$yublueflower_1337scr1_tmp" < "$yublueflower_1337scr1_wrk" > /dev/null
+    tee -a "$yublueflower_1337c0de_tmp" < "$yublueflower_1337c0de_raw" > /dev/null && sort -u "$yublueflower_1337c0de_tmp" | tee "$yublueflower_1337c0de_wrk" > /dev/null && tee "$yublueflower_1337c0de_tmp" < "$yublueflower_1337c0de_wrk" > /dev/null
+    tee -a "$yublueflower_1337scr1_tmp" < "$yublueflower_1337scr1_raw" > /dev/null && sort -u "$yublueflower_1337scr1_tmp" | tee "$yublueflower_1337scr1_wrk" > /dev/null && tee "$yublueflower_1337scr1_tmp" < "$yublueflower_1337scr1_wrk" > /dev/null
 
     rraw=()
     for h in "${live_session[@]}"; do
