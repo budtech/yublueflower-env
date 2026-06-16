@@ -262,7 +262,7 @@ function yublueflower_workflow() {
         if [[ "$extended_workflows" == "--extended-workflows" ]]; then
             katana -u "$url" -silent |
             grep -E "^${url%/}(/|$)" |
-            grep -Ei '\.(env|git|json|js|yml|yaml)(\?|$)' |
+            grep -Ei '(\.(env|git|json|yml|yaml)(\?|$)|/(config|env|api|auth|oauth|sso|admin|graphql|swagger|openapi|internal|private|debug|staging|firebase|aws|gcp|azure|payment|billing|webhook|settings)[^/]*\.js(\?|$))' |
             sed -E 's/(\.env|\.git|\.json|\.js|\.yml|\.yaml).*/\1/' |
             sort -u |
             httpx -match-code 200 -silent |
@@ -373,7 +373,7 @@ function yublueflower_workflow() {
             urlfinder -d "$domain" -silent |
             perl -pe 's/[^[:print:]\t\r\n]//g' |
             grep -E "^${url%/}(/|$)" |
-            grep -Ei '\.(env|git|json|js|yml|yaml)(\?|$)' |
+            grep -Ei '(\.(env|git|json|yml|yaml)(\?|$)|/(config|env|api|auth|oauth|sso|admin|graphql|swagger|openapi|internal|private|debug|staging|firebase|aws|gcp|azure|payment|billing|webhook|settings)[^/]*\.js(\?|$))' |
             sed -E 's/(\.env|\.git|\.json|\.js|\.yml|\.yaml).*/\1/' |
             sort -u |
             httpx -match-code 200 -silent |
@@ -480,7 +480,7 @@ function yublueflower_workflow() {
 
             katana -u "$url" -silent |
             grep -E "^${url%/}(/|$)" |
-            grep -Ei '\.(env|git|json|js|yml|yaml)(\?|$)' |
+            grep -Ei '(\.(env|git|json|yml|yaml)(\?|$)|/(config|env|api|auth|oauth|sso|admin|graphql|swagger|openapi|internal|private|debug|staging|firebase|aws|gcp|azure|payment|billing|webhook|settings)[^/]*\.js(\?|$))' |
             sed -E 's/(\.env|\.git|\.json|\.js|\.yml|\.yaml).*/\1/' |
             sort -u |
             httpx -match-code 200 -silent |
