@@ -159,7 +159,7 @@ function yublueflower_workflow() {
     
     yublueflower_1337scr1_regex='\.(jpg|jpeg|png|gif|svg|ico|css|js|woff2?|ttf|eot|pdf|zip|tar|gz|rar|mp4|mp3|docx?|xlsx?|pptx?|exe|apk|json|xml|csv)(\?|$)'
 
-    yublueflower_1337b4sh_regex='(\?|&)(utm_(source|medium|campaign|term|content)|fbclid|gclid|yclid|msclkid|ga(_cid|id)?|mc_(cid|eid)|_hs(enc|mi)?|ref(_src|_url|id)?|src|source(Name)?|from|via|tracking|track(id)?|click|ad(id|group(id)?)?|pixel|campaignid|theme|style|layout|format|viewtype|preview|width|height|nocache|noload|cache|ver(sion)?|ts|timestamp|_|cb|rnd|client|browser|device|screen|dpi|env|platform|debug|log|tab|offset|start(index)?|step|scroll|position|expand|collapse|open|closed|show)='
+    yublueflower_1337b4sh_regex='(\?|&)(utm_(source|medium|campaign|term|content)|fbclid|gclid|yclid|msclkid|ga(_cid|id)?|mc_(cid|eid)|_hs(enc|mi)?|ref(_src|_url|id)?|src|source(Name)?|from|via|tracking|track(id)?|click|ad(id|group(id)?)?|pixel|campaignid|theme|style|layout|format|viewtype|preview|width|height|nocache|noload|cache|ver(sion)?|ts|timestamp|_|cb|rnd|client|browser|device|screen|dpi|env|platform|debug|log|tab|offset|start(index)?|step|scroll|position|expand|collapse|open|closed|show|autoplay|resumeTime|chaseplay|msockid|frm_id|ncid|_gl|twclid)='
 
     if [[ "$web_archives" != "--web-archives" ]]; then
         katana -u "$url" -match-regex '.*\?.*=.*' -silent |
