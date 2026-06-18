@@ -106,7 +106,14 @@ function yublueflower_workflow() {
     trap 'yublueflower_cleanup; exit 130' INT
     trap 'yublueflower_cleanup; exit 143' TERM
 
-    nuclei -u "$url" -timestamp -silent -markdown-export "$wrkp" | tee -a "$yublueflower_1337pwnd_raw"
+    for pwnd in info low medium high critical unknown; do
+        nuclei -u "$url" \
+            -s "$pwnd" \
+            -timestamp "${rraw[@]}" \
+            -headless \
+            -silent \
+            -markdown-export "$wrkp"
+    done | tee -a "$yublueflower_1337pwnd_raw"
 
     perl -pe 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$yublueflower_1337pwnd_raw" | tee "$yublueflower_1337pwnd_wrk" > /dev/null
     p1=0; p2=0; p3=0; p4=0; p5=0; unknown=0
