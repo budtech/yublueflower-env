@@ -107,10 +107,11 @@ function yublueflower_workflow() {
     trap 'yublueflower_cleanup; exit 143' TERM
 
     for pwnd in info low medium high critical unknown; do
-        nuclei -u "$url" \
+        timeout -k 5s 10m nuclei -u "$url" \
             -s "$pwnd" \
             -timestamp "${rraw[@]}" \
             -headless \
+            -c 50 \
             -silent \
             -markdown-export "$wrkp"
     done | tee -a "$yublueflower_1337pwnd_raw"
