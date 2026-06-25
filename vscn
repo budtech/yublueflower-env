@@ -51,19 +51,15 @@ function yublueflower_stage() {
 function yublueflower_report_fallback() {
     local report_file
     if ! compgen -G "$wrkp/*.md" > /dev/null; then
-        report_file="$wrkp/possible-active-protection-mechanisms.md"
+        report_file="$wrkp/target-did-not-respond.md"
         {
-            echo "# Possible Active Protection Mechanisms"
+            echo "# Target Did Not Respond"
             echo ""
-            echo "No findings were identified during this assessment."
+            echo "The target did not respond within the expected time frame during testing."
             echo ""
-            echo "Possible reasons include:"
+            echo "As a result, the scan could not be completed."
             echo ""
-            echo "- Security protection mechanisms limiting access to certain areas."
-            echo "- Authentication or specific access privileges being required."
-            echo "- Features, endpoints, or parameters not being reachable during the assessment."
-            echo ""
-            echo "These conditions may affect the visibility and coverage of the web application or API being assessed."
+            echo "Possible causes include connectivity issues, service unavailability, traffic filtering, rate limiting, or temporary infrastructure unavailability."
         } > "$report_file"
     fi
 }
