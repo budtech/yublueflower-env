@@ -45,7 +45,7 @@ function yublueflower_stage() {
     stage_ts=$(date '+%Y-%m-%d %H:%M:%S')
     [[ -n "$yublueflower_stage_file" ]] && printf '%s\n' "$stage" > "$yublueflower_stage_file"
     [[ -n "$yublueflower_stage_log" ]] && printf '[%s] %s\n' "$stage_ts" "$stage" >> "$yublueflower_stage_log"
-    echo -e "[\033[36m$stage_ts\033[0m] Stage: $stage"
+    echo -e "[\033[36m$stage_ts\033[0m] stage: $stage"
 }
 
 function yublueflower_report_fallback() {
