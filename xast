@@ -152,6 +152,7 @@ function yublueflower_workflow() {
     domain=$(echo "$url" | sed -E 's|https?://||' | cut -d'/' -f1)
     timestamp=$(date "+%Y%m%d%H%M%S")
     yublueflower_state_dir=$(mktemp -d "/tmp/xast_$(date '+%Y%m%d_%H%M%S')_XXXXXX_mktemp")
+    echo -e "[\033[36m$(date '+%Y-%m-%d %H:%M:%S')\033[0m] Init state \033[36m$yublueflower_state_dir\033[0m — in progress"
     yublueflower_stage_file="$yublueflower_state_dir/current-stage.txt"
     yublueflower_stage_log="$yublueflower_state_dir/stage.log"
     yublueflower_1337c0de_raw=$(mktemp "/tmp/yublueflower_1337c0de_raw_${timestamp}_XXXXXX_mktemp.txt")
