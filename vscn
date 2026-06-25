@@ -119,22 +119,26 @@ function yublueflower_workflow() {
     trap 'yublueflower_cleanup; exit 143' TERM
 
     yublueflower_stage "scanning"
-    timeout -k 5s 10m nuclei -u "$url" \
-        -s info,unknown \
-        -timestamp \
-        -headless \
-        -c 50 \
-        -silent \
-        -markdown-export "$wrkp" | tee -a "$yublueflower_1337pwnd_raw"
+    for pwnd in info unknown; do
+        timeout -k 5s 10m nuclei -u "$url" \
+            -s "$pwnd" \
+            -timestamp \
+            -headless \
+            -c 50 \
+            -silent \
+            -markdown-export "$wrkp"
+    done | tee -a "$yublueflower_1337pwnd_raw"
 
     yublueflower_stage "vulnerability assessment"
-    timeout -k 5s 10m nuclei -u "$url" \
-        -s low,medium,high,critical \
-        -timestamp \
-        -headless \
-        -c 50 \
-        -silent \
-        -markdown-export "$wrkp" | tee -a "$yublueflower_1337pwnd_raw"
+    for pwnd in low medium high critical; do
+        timeout -k 5s 10m nuclei -u "$url" \
+            -s "$pwnd" \
+            -timestamp \
+            -headless \
+            -c 50 \
+            -silent \
+            -markdown-export "$wrkp"
+    done | tee -a "$yublueflower_1337pwnd_raw"
 
     yublueflower_stage "reporting"
     perl -pe 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$yublueflower_1337pwnd_raw" | tee "$yublueflower_1337pwnd_wrk" > /dev/null
