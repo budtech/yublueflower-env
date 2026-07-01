@@ -172,7 +172,7 @@ function yublueflower_workflow() {
 
     yublueflower_stage "reconnaissance"
     if [[ "$web_archives" != "--web-archives" ]]; then
-        timeout -k 5s 10m katana -u "$url" -match-regex '.*\?.*=.*' -jsl -hl -xhr -silent |
+        timeout -k 5s 10m katana -u "$url" -match-regex '.*\?.*=.*' -jsl -xhr -silent |
         perl -pe 's/[^[:print:]\t\r\n]//g' |
         grep -E "^${url%/}(/|$)" |
         grep -Ev "$yublueflower_1337scr1_regex" |
@@ -270,9 +270,9 @@ function yublueflower_workflow() {
         done
 
         if [[ "$extended_workflows" == "--extended-workflows" ]]; then
-            timeout -k 5s 10m katana -u "$url" -jsl -hl -xhr -silent |
+            timeout -k 5s 10m katana -u "$url" -jsl -xhr -silent |
             grep -E "^${url%/}(/|$)" |
-            grep -Ei '(\.(env|git|json|yml|yaml)(\?|$)|/(config|env|api|auth|oauth|sso|admin|graphql|swagger|openapi|internal|private|debug|staging|firebase|aws|gcp|azure|payment|billing|webhook|settings)[^/]*\.js(\?|$))' |
+            grep -Ei '(\.(env|git|json)(\?|$)|/(config|env|api|auth|oauth|sso|admin|graphql|swagger|openapi|internal|private|debug|staging|firebase|aws|gcp|azure|payment|billing|webhook|settings)[^/]*\.js(\?|$)|\.(yml|yaml)(\?|$))' |
             sed -E 's/(\.env|\.git|\.json|\.js|\.yml|\.yaml).*/\1/' |
             sort -u |
             httpx -match-code 200 -silent |
@@ -383,7 +383,7 @@ function yublueflower_workflow() {
             timeout -k 5s 10m urlfinder -d "$domain" -silent |
             perl -pe 's/[^[:print:]\t\r\n]//g' |
             grep -E "^${url%/}(/|$)" |
-            grep -Ei '(\.(env|git|json|yml|yaml)(\?|$)|/(config|env|api|auth|oauth|sso|admin|graphql|swagger|openapi|internal|private|debug|staging|firebase|aws|gcp|azure|payment|billing|webhook|settings)[^/]*\.js(\?|$))' |
+            grep -Ei '(\.(env|git|json)(\?|$)|/(config|env|api|auth|oauth|sso|admin|graphql|swagger|openapi|internal|private|debug|staging|firebase|aws|gcp|azure|payment|billing|webhook|settings)[^/]*\.js(\?|$)|\.(yml|yaml)(\?|$))' |
             sed -E 's/(\.env|\.git|\.json|\.js|\.yml|\.yaml).*/\1/' |
             sort -u |
             httpx -match-code 200 -silent |
@@ -391,7 +391,7 @@ function yublueflower_workflow() {
                 echo -e "[\e[36m$(date '+%Y-%m-%d %H:%M:%S')\e[0m] $line"
             done
 
-            timeout -k 5s 10m katana -u "$url" -match-regex '.*\?.*=.*' -jsl -hl -xhr -silent |
+            timeout -k 5s 10m katana -u "$url" -match-regex '.*\?.*=.*' -jsl -xhr -silent |
             perl -pe 's/[^[:print:]\t\r\n]//g' |
             grep -E "^${url%/}(/|$)" |
             grep -Ev "$yublueflower_1337scr1_regex" |
@@ -488,9 +488,9 @@ function yublueflower_workflow() {
                 echo -e "[\e[36m$(date '+%Y-%m-%d %H:%M:%S')\e[0m] $line"
             done
 
-            timeout -k 5s 10m katana -u "$url" -jsl -hl -xhr -silent |
+            timeout -k 5s 10m katana -u "$url" -jsl -xhr -silent |
             grep -E "^${url%/}(/|$)" |
-            grep -Ei '(\.(env|git|json|yml|yaml)(\?|$)|/(config|env|api|auth|oauth|sso|admin|graphql|swagger|openapi|internal|private|debug|staging|firebase|aws|gcp|azure|payment|billing|webhook|settings)[^/]*\.js(\?|$))' |
+            grep -Ei '(\.(env|git|json)(\?|$)|/(config|env|api|auth|oauth|sso|admin|graphql|swagger|openapi|internal|private|debug|staging|firebase|aws|gcp|azure|payment|billing|webhook|settings)[^/]*\.js(\?|$)|\.(yml|yaml)(\?|$))' |
             sed -E 's/(\.env|\.git|\.json|\.js|\.yml|\.yaml).*/\1/' |
             sort -u |
             httpx -match-code 200 -silent |
